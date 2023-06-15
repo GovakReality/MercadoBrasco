@@ -1,0 +1,34 @@
+{
+  "name": "camerakitnpm",
+  "version": "1.0.0",
+  "description": "just a test",
+  "source": "src/index.html",
+  "scripts": {
+    "start": "parcel",
+    "build": "npm run clean && parcel build --no-source-maps --target web",
+    "clean": "rm -rf dist/*",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "govakreality",
+  "license": "ISC",
+  "dependencies": {
+    "@snap/camera-kit": "^0.9.1",
+    "dotenv": "^16.1.4"
+  },
+  "devDependencies": {
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.0",
+    "events": "^3.3.0",
+    "os-browserify": "^0.3.0",
+    "parcel": "^2.9.2",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
+    "stream-browserify": "^3.0.0"
+  },
+  "targets": {
+    "web": {
+      "context": "browser",
+      "publicUrl": "./"
+    }
+  }
+}
