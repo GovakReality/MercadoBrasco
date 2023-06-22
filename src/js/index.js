@@ -23,7 +23,13 @@ window.addEventListener("load", async () => {
       const source = await createUserMediaSource();
       await session.setSource(source);
       source.setTransform(Transform2D.MirrorX);
-      //source.setRenderSize(480, 640);
+
+      // 9:16 resolutions
+      //source.setRenderSize(1080, 1920);  //FHD
+      //source.setRenderSize(720, 1280);  //SD
+      source.setRenderSize(540, 960);   //qHD
+      //source.setRenderSize(480, 854);   //FWVGA
+      //source.setRenderSize(360, 640);   //nHD
 
       session.play("live");
         
