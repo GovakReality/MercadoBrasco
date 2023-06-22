@@ -7,8 +7,20 @@ const lensId = process.env.LENSID;
 
 let source;
 
+// check if camera permission is granted
+navigator.permissions.query({ name: "camera" }).then(res => {
+  if(res.state != "granted"){
+    document.getElementById('warning').style.display = 'block';
+  }
+});
+
+// when window load
 window.addEventListener("load", async () => {
+
+  // hide loader gif
   document.getElementById('loader').remove();
+
+  // start snapchat lens
   try {
     const cameraKit = await bootstrapCameraKit({ apiToken: apiToken });
     const session = await cameraKit.createSession();
@@ -18,9 +30,6 @@ window.addEventListener("load", async () => {
     document.getElementById('canvas-output').replaceWith(session.output.live);
 
     const lens = await cameraKit.lensRepository.loadLens(lensId, groupId);
-
-    //console.log(lens);
-
     session.applyLens(lens);
 
     source = await createUserMediaSource();
@@ -35,6 +44,7 @@ window.addEventListener("load", async () => {
   }
 });
 
+// when window is resized
 window.addEventListener("resize", async () => {
   try {
     setRenderSize();        
@@ -43,6 +53,7 @@ window.addEventListener("resize", async () => {
   }
 });
 
+// helper functions
 function setRenderSize() {
   let screenWidth = window.screen.availWidth;
 
