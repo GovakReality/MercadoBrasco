@@ -9,6 +9,10 @@ html, body {
   background-color: #000;
 }
 
+#debug { 
+	color: #FFF;
+} 
+
 #wrapper { 
 	display: flex; 
 	justify-content: center;
@@ -18,4 +22,5 @@ html, body {
 canvas { 
   display: block;
   max-width: 100%;
+  width: 100%;
 }
