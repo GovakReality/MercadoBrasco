@@ -8,6 +8,7 @@ const lensId = process.env.LENSID;
 let source;
 
 window.addEventListener("load", async () => {
+  document.getElementById('loader').remove();
   try {
     const cameraKit = await bootstrapCameraKit({ apiToken: apiToken });
     const session = await cameraKit.createSession();
