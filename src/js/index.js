@@ -10,7 +10,7 @@ let source;
 // check if camera permission is granted
 navigator.permissions.query({ name: "camera" }).then(res => {
   if(res.state != "granted"){
-    document.getElementById('warning').style.display = 'block';
+    document.getElementById('warning-camera').style.display = 'block';
   }
 });
 
@@ -35,7 +35,10 @@ window.addEventListener("load", async () => {
     source = await createUserMediaSource();
     await session.setSource(source);
     source.setTransform(Transform2D.MirrorX);
-    setRenderSize();
+    //setRenderSize();
+
+    source.setRenderSize(360, 640);
+    //source.setRenderSize(window.screen.availWidth, window.screen.availHeight);
 
     session.play("live");
         
@@ -47,7 +50,7 @@ window.addEventListener("load", async () => {
 // when window is resized
 window.addEventListener("resize", async () => {
   try {
-    setRenderSize();        
+    //setRenderSize();        
   } catch (error) {
     console.error(error);
   }
