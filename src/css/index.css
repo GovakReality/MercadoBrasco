@@ -13,6 +13,8 @@ html, body {
 	color: #FFF;
 	display: block;
 	background-color: #000;
+	z-index: 999;
+	position: absolute;
 } 
 
 .container {

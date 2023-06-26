@@ -8,12 +8,22 @@ const lensId = process.env.LENSID;
 let source;
 
 // check if camera permission is granted
-navigator.permissions.query({ name: "camera" }).then(res => {
-  if(res.state != "granted"){
-    //show warning message
-    document.getElementById('warning-camera').style.display = 'block';
-  }
-});
+navigator.permissions
+  .query({ name: "camera" })
+  .then((permissionStatus) => {
+    if(permissionStatus.state != "granted"){
+      //show warning message
+      document.getElementById('warning-camera').style.display = 'block';
+    }
+    permissionStatus.onchange = () => {
+      if(permissionStatus.state != "granted"){
+        //show warning message
+        document.getElementById('warning-camera').style.display = 'block';
+      } else {
+        document.getElementById('warning-camera').style.display = 'none';
+      }
+    };
+  });
 
 // when window load
 window.addEventListener("load", async () => {
@@ -36,10 +46,8 @@ window.addEventListener("load", async () => {
     source = await createUserMediaSource();
     await session.setSource(source);
     source.setTransform(Transform2D.MirrorX);
-    //setRenderSize();
-
-    source.setRenderSize(360, 360);
-    //source.setRenderSize(window.screen.availWidth, window.screen.availHeight);
+    setRenderSize();
+    //source.setRenderSize(360, 360);
 
     session.play("live");
         
@@ -52,7 +60,7 @@ window.addEventListener("load", async () => {
 // when window is resized
 window.addEventListener("resize", async () => {
   try {
-    //setRenderSize();        
+    setRenderSize();        
   } catch (error) {
     console.error(error);
   }
@@ -60,36 +68,21 @@ window.addEventListener("resize", async () => {
 
 // helper functions
 function setRenderSize() {
-  let screenWidth = window.screen.availWidth;
+  let h = document.documentElement.clientHeight;
+  //let w = document.documentElement.clientWidth;
+  let w = getWidth(h);
+  console.log(w)
+  source.setRenderSize(w, h);
+  resolutionDebug();
+}
 
-  if(screenWidth < 576) {
-    resolutionDebug('< 576');
-    source.setRenderSize(360, 640);
+function getWidth(value) {
+  let ratio = (9/16);
+  let width = value * ratio;
+  return Math.round(width);
+}
 
-  } else if (screenWidth < 768) {
-    resolutionDebug('< 768');
-    source.setRenderSize(480, 854);
-
-  } else if (screenWidth < 992) {
-    resolutionDebug('< 992');
-    source.setRenderSize(540, 960);
-
-  } else if (screenWidth < 1200) {
-    resolutionDebug('< 1200');
-    source.setRenderSize(720, 1280);
-
-  } else if (screenWidth < 1536) {
-    resolutionDebug('< 1536');
-    source.setRenderSize(1080, 1920);   
-
-  } else if (screenWidth < 1920) {
-    resolutionDebug('< 1920');
-    source.setRenderSize(1440, 2560);  
-
-  } else {
-    resolutionDebug('> 1920');
-    source.setRenderSize(2160, 3840);    
-  }
+function resolutionDebug() {
 
   //--- 9:16 resolutions ---//
   //(2160 X 3840)
@@ -99,51 +92,14 @@ function setRenderSize() {
   //(540 X 960)   //qHD
   //(480 X 854)   //FWVGA
   //(360 X 640)   //nHD
-}
 
-function setRenderSize2() {
-  let screenWidth = window.screen.availWidth;
+  let size = '<br> screen size: ' + window.screen.width.toString() + ' x ' + window.screen.height.toString();
+  let avail = '<br> avail: ' + window.screen.availWidth.toString() + ' x ' + window.screen.availHeight.toString();
+  let outer = '<br> window outer: ' + window.outerWidth.toString() + ' x ' + window.outerHeight.toString();
+  let inner = '<br> window inner: ' + window.innerWidth.toString() + ' x ' + window.innerHeight.toString();
+  let client = '<br> document client: ' + document.documentElement.clientWidth.toString() + ' x ' + document.documentElement.clientHeight.toString();
 
-  if(screenWidth < 576) {
-    resolutionDebug('< 576');
-    source.setRenderSize(576, 1024);
+  console.log(size + avail + outer + inner + client);
 
-  } else if (screenWidth < 765) {
-    resolutionDebug('< 765');
-    source.setRenderSize(765, 1360);
-
-  } else if (screenWidth < 990) {
-    resolutionDebug('< 990');
-    source.setRenderSize(990, 1760);
-
-  } else if (screenWidth < 1224) {
-    resolutionDebug('< 1224');
-    source.setRenderSize(1224, 2176);
-
-  } else if (screenWidth < 1530) {
-    resolutionDebug('< 1530');
-    source.setRenderSize(1530, 2720);   
-
-  } else if (screenWidth < 1908) {
-    resolutionDebug('< 1908');
-    source.setRenderSize(1908, 3392);  
-
-  } else {
-    resolutionDebug('> 1920');
-    source.setRenderSize(2160, 3840);    
-  }
-
-  //--- 9:16 resolutions ---//
-  //(2160 X 3840)
-  //(1440 X 2560) 
-  //(1080 X 1920) //FHD
-  //(720 X 1280)  //SD
-  //(540 X 960)   //qHD
-  //(480 X 854)   //FWVGA
-  //(360 X 640)   //nHD
-}
-
-function resolutionDebug(val) {
-  console.log(val);
-  document.getElementById("debug").innerHTML = val.toString();
+  document.getElementById("debug").innerHTML = size + avail + outer + inner + client;
 }
