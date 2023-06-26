@@ -9,40 +9,45 @@ html, body {
   background-color: #000;
 }
 
-#debug { 
+.debug { 
 	color: #FFF;
+	display: block;
+	background-color: #000;
 } 
 
-#wrapper-canvas { 
+.container {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	left: 0;
+}
+
+.wrapper { 
 	display: flex; 
 	justify-content: center;
 	align-items: center;
+	height: 100%;
 } 
 
-#wrapper-utils { 
-	display: flex; 
-	justify-content: center;
-	align-items: center;
-	height:100%;
-} 
-
-#loader, #loader img {
+.loader, .loader img {
 	width: 100px;
   height: 100px;
 }
 
-#warning-camera {
+.warning {
   display: none;
 	padding: 0px 10px;
+	text-align: center;
 }
 
-#warning-camera img {
+.warning img {
 	width: 400px;
 	max-width: 100%;
 }
 
-canvas { 
+.canvas-output { 
   display: block;
-  max-width: 100%;
-  width: 100%;
+  /* max-width: 100%; */
+  /* width: 100%; */
 }

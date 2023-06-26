@@ -10,6 +10,7 @@ let source;
 // check if camera permission is granted
 navigator.permissions.query({ name: "camera" }).then(res => {
   if(res.state != "granted"){
+    //show warning message
     document.getElementById('warning-camera').style.display = 'block';
   }
 });
@@ -17,8 +18,8 @@ navigator.permissions.query({ name: "camera" }).then(res => {
 // when window load
 window.addEventListener("load", async () => {
 
-  // hide loader gif
-  document.getElementById('loader').remove();
+  // hide loader gif and show canvas
+  document.getElementById('loader').style.display = 'none';
 
   // start snapchat lens
   try {
@@ -37,7 +38,7 @@ window.addEventListener("load", async () => {
     source.setTransform(Transform2D.MirrorX);
     //setRenderSize();
 
-    source.setRenderSize(360, 640);
+    source.setRenderSize(360, 360);
     //source.setRenderSize(window.screen.availWidth, window.screen.availHeight);
 
     session.play("live");
@@ -45,6 +46,7 @@ window.addEventListener("load", async () => {
   } catch (error) {
     console.error(error);
   }
+
 });
 
 // when window is resized
