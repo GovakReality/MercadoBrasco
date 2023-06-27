@@ -69,8 +69,8 @@ window.addEventListener("resize", async () => {
 // helper functions
 function setRenderSize() {
   let h = document.documentElement.clientHeight;
-  //let w = document.documentElement.clientWidth;
-  let w = getWidth(h);
+  let w = document.documentElement.clientWidth;
+  //let w = getWidth(h);
   console.log(w)
   source.setRenderSize(w, h);
   resolutionDebug();
