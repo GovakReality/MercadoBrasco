@@ -12,7 +12,7 @@
   "author": "govakreality",
   "license": "ISC",
   "dependencies": {
-    "@snap/camera-kit": "^0.9.1",
+    "@snap/camera-kit": "^0.10.0",
     "dotenv": "^16.1.4"
   },
   "devDependencies": {
