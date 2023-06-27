@@ -1,15 +1,32 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
     <head>
-        <title>Test CameraKit</title>
+        <title>Espaço Brasco</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+        <link rel="stylesheet" href="css/index.css">
     </head>
 
     <body>
-        <h1>camera kit test na main!</h1>
-        <canvas id="canvas-output"></canvas>
+        <p id="debug" class="debug"></p>
+
+        <div class="container">
+            <div class="wrapper">
+                <div class="loader" id="loader">
+                    <img src="img/loader.gif" alt="loader">
+                </div>
+                <div class="warning" id="warning-camera">
+                    <img src="img/warning.png" alt="camera access warning">
+                </div>
+            </div>
+        </div> 
+
+        <div class="container">
+            <div class="wrapper">
+                <canvas class="canvas-output" id="canvas-output"></canvas>
+            </div>  
+        </div>
+        
         <script src="js/index.js" type="module"></script>
     </body>
 </html>
