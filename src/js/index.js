@@ -7,30 +7,19 @@ const lensId = process.env.LENSID;
 
 let source;
 
-// check if camera permission is granted
-navigator.permissions
-  .query({ name: "camera" })
-  .then((permissionStatus) => {
-    if(permissionStatus.state != "granted"){
-      //show warning message
-      document.getElementById('warning-camera').style.display = 'block';
-    }
-    permissionStatus.onchange = () => {
-      if(permissionStatus.state != "granted"){
-        //show warning message
-        document.getElementById('warning-camera').style.display = 'block';
-      } else {
-        document.getElementById('warning-camera').style.display = 'none';
-      }
-    };
-  });
-
 // when window load
 window.addEventListener("load", async () => {
 
-  // hide loader gif and show canvas
-  document.getElementById('loader').style.display = 'none';
-
+  // check if camera permission is granted
+  navigator.permissions
+  .query({ name: "camera" })
+  .then((permissionStatus) => {
+    permissionHandle(permissionStatus.state);
+    permissionStatus.onchange = () => {
+      permissionHandle(permissionStatus.state);
+    };
+  });
+        
   // start snapchat lens
   try {
     const cameraKit = await bootstrapCameraKit({ apiToken: apiToken });
@@ -71,15 +60,37 @@ function setRenderSize() {
   let h = document.documentElement.clientHeight;
   let w = document.documentElement.clientWidth;
   //let w = getWidth(h);
-  console.log(w)
   source.setRenderSize(w, h);
-  resolutionDebug();
+  //resolutionDebug();
 }
 
 function getWidth(value) {
   let ratio = (9/16);
   let width = value * ratio;
   return Math.round(width);
+}
+
+function permissionHandle(status) {
+  if(status == "granted"){
+
+    // hide loader gif
+    document.getElementById('loader').style.display = 'none';
+    // hide warning message
+    document.getElementById('warning-camera').style.display = 'none';
+
+  } else if(status == "denied"){
+
+    // hide loader gif
+    document.getElementById('loader').style.display = 'none';
+    //show warning message
+    document.getElementById('warning-camera').style.display = 'block';
+
+  } else { //status == prompt
+
+    // show loader gif
+    document.getElementById('loader').style.display = 'block';
+
+  }
 }
 
 function resolutionDebug() {
