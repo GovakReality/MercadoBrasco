@@ -1,5 +1,5 @@
 import {} from 'dotenv/config';
-import { bootstrapCameraKit, createUserMediaSource, createMediaStreamSource , Transform2D } from "@snap/camera-kit";
+import { bootstrapCameraKit, createUserMediaSource, createMediaStreamSource, Transform2D } from "@snap/camera-kit";
 
 const apiToken = process.env.APITOKEN;
 const groupId = process.env.GROUPID;
@@ -22,12 +22,97 @@ window.addEventListener("load", async () => {
     };
   });
 
-
-
   // start snapchat lens
   try {
 
-    const cameraKit = await bootstrapCameraKit({ apiToken: apiToken });
+    const cameraKit = await bootstrapCameraKit({apiToken: apiToken});
+  
+    const canvas = document.getElementById('canvas-output');
+    const session = await cameraKit.createSession({ liveRenderTarget: canvas });
+
+    const lens = await cameraKit.lensRepository.loadLens(lensId, groupId);
+    session.applyLens(lens);
+
+    const mediaStream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      //video: true,         
+      video: { facingMode: { exact: "environment" } },
+      /*video: {
+        width: {
+          min: 900,
+          ideal: 900,
+          max: 900,
+        },
+        height: {
+          min: 900,
+          ideal: 900,
+          max: 900
+        } 
+      } */       
+    });
+
+    source = createMediaStreamSource(mediaStream);
+    
+    await session.setSource(source, { cameraType: 'back' });
+
+    //let h = document.documentElement.clientHeight;
+    //let w = document.documentElement.clientWidth;    
+    //source.setRenderSize(w, h);
+    setRenderSize();
+  
+    session.play();
+
+    /* const cameraKit = await bootstrapCameraKit({apiToken: apiToken});
+  
+    const canvas = document.getElementById('canvas-output');
+    const session = await cameraKit.createSession({ liveRenderTarget: canvas });
+
+    const lens = await cameraKit.lensRepository.loadLens(lensId, groupId);
+    session.applyLens(lens);
+
+    let h = document.documentElement.clientHeight;
+    let w = document.documentElement.clientWidth;
+
+    const mediaStream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      //video: true,
+      video: {
+        width: {
+          min: 900,
+          ideal: 900,
+          max: 900,
+        },
+        height: {
+          min: 700,
+          ideal: 700,
+          max: 700
+        }
+      }           
+      //video: {
+      //  facingMode: { exact: "environment" },
+      //},
+    });
+
+
+
+
+    const xx = await createUserMediaSource();//createMediaStreamSource(mediaStream);
+   
+    //console.log(mediaStream.getCapabilities());
+    const source = await createUserMediaSource();
+
+    session.setSource( source, {
+      //transform: Transform2D.MirrorX,
+      cameraType: 'back'
+    });
+
+    debug();
+  
+    await xx.setRenderSize(h, w);
+    await session.play(); */
+    //mediaStream.setRenderSize(500, 500);
+
+/*     const cameraKit = await bootstrapCameraKit({ apiToken: apiToken });
     const session = await cameraKit.createSession();
 
     session.events.addEventListener("error", (event) => console.error(event.detail));
@@ -37,33 +122,16 @@ window.addEventListener("load", async () => {
     const lens = await cameraKit.lensRepository.loadLens(lensId, groupId);
     session.applyLens(lens);
 
-    source = await createUserMediaSource();
+    const source = await createUserMediaSource();
     await session.setSource(source, { cameraType: 'back' });
     source.setTransform(Transform2D.MirrorX);
-    setRenderSize();
+
+    let h = document.documentElement.clientHeight;
+    let w = document.documentElement.clientWidth;    
+    source.setRenderSize(w, h);
   
-    session.play("live");
-
-/*     const cameraKit = await bootstrapCameraKit({ apiToken: apiToken });
-
-    const canvas = document.getElementById("canvas-output");
-    const session = await cameraKit.createSession(canvas);
-
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    const source = await createMediaStreamSource(stream, {
-        transform: Transform2D.MirrorX,
-        cameraType: "back",
-    });
-
-    //setRenderSize();
-
-    session.setSource(source);
-
-    const lens = await cameraKit.lensRepository.loadLens(lensId, groupId);
-    session.applyLens(lens);
-
     session.play("live"); */
-
+    
   } catch (error) {
     console.error(error);
   }
@@ -73,12 +141,11 @@ window.addEventListener("load", async () => {
 // when window is resized
 window.addEventListener("resize", async () => {
   try {
-    setRenderSize();        
+    //setRenderSize();        
   } catch (error) {
     console.error(error);
   }
 });
-
 
 // refresh button
 const refreshBtn = document.getElementById("warning-camera");
@@ -92,7 +159,7 @@ function setRenderSize() {
   let w = document.documentElement.clientWidth;
   //let w = getWidth(h);
   source.setRenderSize(w, h);
-  //resolutionDebug();
+  //debug();
 }
 
 function getWidth(value) {
@@ -104,6 +171,15 @@ function getWidth(value) {
 function permissionHandle(status) {
 
   OSHandle();
+
+  if(oldPermission == "granted") {
+    if(status == "granted") {
+      // hide loader gif
+      document.getElementById('loader').style.display = 'none';
+      // hide warning message
+      document.getElementById('warning-camera').style.display = 'none';
+    }
+  }
 
   if(oldPermission == "prompt") {
     if(status == "granted") {
@@ -158,7 +234,15 @@ function getMobileOS() {
   return "Other"
 }
 
-function resolutionDebug() {
+async function getDevices() {
+  let d =  await navigator.mediaDevices.enumerateDevices();
+  //console.log(d[0].getCapabilities());
+  //console.log(navigator.mediaDevices.getSupportedConstraints());
+}
+
+function debug() {
+
+  document.getElementById("debug").style.display = 'block';
 
   //--- 9:16 resolutions ---//
   //(2160 X 3840)
@@ -175,7 +259,8 @@ function resolutionDebug() {
   let inner = '<br> window inner: ' + window.innerWidth.toString() + ' x ' + window.innerHeight.toString();
   let client = '<br> document client: ' + document.documentElement.clientWidth.toString() + ' x ' + document.documentElement.clientHeight.toString();
 
-  console.log(size + avail + outer + inner + client);
+  let output = client + inner + outer + avail + size;
 
-  document.getElementById("debug").innerHTML = size + avail + outer + inner + client;
+  console.log(output);
+  document.getElementById("debug").innerHTML = output;
 }
