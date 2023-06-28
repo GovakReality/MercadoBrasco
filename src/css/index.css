@@ -41,6 +41,7 @@ html, body {
   display: none;
 	padding: 0px 10px;
 	text-align: center;
+	z-index: 999;
 }
 
 .warning img {

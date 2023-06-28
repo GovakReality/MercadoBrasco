@@ -1,11 +1,12 @@
 import {} from 'dotenv/config';
-import { bootstrapCameraKit, createMediaStreamSource, Transform2D } from "@snap/camera-kit";
+import { bootstrapCameraKit, createUserMediaSource, createMediaStreamSource , Transform2D } from "@snap/camera-kit";
 
 const apiToken = process.env.APITOKEN;
 const groupId = process.env.GROUPID;
 const lensId = process.env.LENSID;
 
 let source;
+let oldPermission;
 
 // when window load
 window.addEventListener("load", async () => {
@@ -14,21 +15,42 @@ window.addEventListener("load", async () => {
   navigator.permissions
   .query({ name: "camera" })
   .then((permissionStatus) => {
+    oldPermission = permissionStatus.state;
     permissionHandle(permissionStatus.state);
-    permissionStatus.onchange = () => {
+    permissionStatus.onchange = (e) => {
       permissionHandle(permissionStatus.state);
     };
   });
-        
+
+
+
   // start snapchat lens
   try {
+
     const cameraKit = await bootstrapCameraKit({ apiToken: apiToken });
+    const session = await cameraKit.createSession();
+
+    session.events.addEventListener("error", (event) => console.error(event.detail));
+
+    document.getElementById('canvas-output').replaceWith(session.output.live);
+
+    const lens = await cameraKit.lensRepository.loadLens(lensId, groupId);
+    session.applyLens(lens);
+
+    source = await createUserMediaSource();
+    await session.setSource(source, { cameraType: 'back' });
+    source.setTransform(Transform2D.MirrorX);
+    setRenderSize();
+  
+    session.play("live");
+
+/*     const cameraKit = await bootstrapCameraKit({ apiToken: apiToken });
 
     const canvas = document.getElementById("canvas-output");
     const session = await cameraKit.createSession(canvas);
 
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    source = createMediaStreamSource(stream, {
+    const source = await createMediaStreamSource(stream, {
         transform: Transform2D.MirrorX,
         cameraType: "back",
     });
@@ -38,9 +60,9 @@ window.addEventListener("load", async () => {
     session.setSource(source);
 
     const lens = await cameraKit.lensRepository.loadLens(lensId, groupId);
-    await session.applyLens(lens);
+    session.applyLens(lens);
 
-    await session.play();
+    session.play("live"); */
 
   } catch (error) {
     console.error(error);
@@ -55,6 +77,13 @@ window.addEventListener("resize", async () => {
   } catch (error) {
     console.error(error);
   }
+});
+
+
+// refresh button
+const refreshBtn = document.getElementById("warning-camera");
+refreshBtn.addEventListener("click", async () => {
+  location.reload();
 });
 
 // helper functions
@@ -76,30 +105,40 @@ function permissionHandle(status) {
 
   OSHandle();
 
-  if(status == "granted"){
-
-    // hide loader gif
-    document.getElementById('loader').style.display = 'none';
-    // hide warning message
-    document.getElementById('warning-camera').style.display = 'none';
-
-  } else if(status == "denied"){
-
-    // hide loader gif
-    document.getElementById('loader').style.display = 'none';
-    //show warning message
-    document.getElementById('warning-camera').style.display = 'block';
-
-  } else { //status == prompt
-
-    // show loader gif
-    document.getElementById('loader').style.display = 'block';
-
+  if(oldPermission == "prompt") {
+    if(status == "granted") {
+      // hide loader gif
+      document.getElementById('loader').style.display = 'none';
+      // hide warning message
+      document.getElementById('warning-camera').style.display = 'none';
+    } else if(status == "denied") {
+      // hide loader gif
+      document.getElementById('loader').style.display = 'none';
+      //show warning message
+      document.getElementById('warning-camera').style.display = 'block';
+    }
   }
+
+  if(oldPermission == "denied") {
+    if(status == "granted") {
+      // hide loader gif
+      document.getElementById('loader').style.display = 'none';
+    } else if(status == "denied") {
+      // hide loader gif
+      document.getElementById('loader').style.display = 'none';
+      //show warning message
+      document.getElementById('warning-camera').style.display = 'block';
+    } else {
+      // show loader gif
+      document.getElementById('loader').style.display = 'block';   
+    }
+  }
+
+  oldPermission = status;
 }
 
 function OSHandle() {
-  if(getMobileOS() == "iOS"){
+  if(getMobileOS() == "iOS") {
     document.getElementById('warning-iphone').style.display = 'block';
     document.getElementById('warning-android').style.display = 'none';
   }  else { 
