@@ -1,5 +1,5 @@
 import {} from 'dotenv/config';
-import { bootstrapCameraKit, createUserMediaSource, Transform2D } from "@snap/camera-kit";
+import { bootstrapCameraKit, createMediaStreamSource, Transform2D } from "@snap/camera-kit";
 
 const apiToken = process.env.APITOKEN;
 const groupId = process.env.GROUPID;
@@ -32,9 +32,18 @@ window.addEventListener("load", async () => {
     const lens = await cameraKit.lensRepository.loadLens(lensId, groupId);
     session.applyLens(lens);
 
-    source = await createUserMediaSource();
-    await session.setSource(source);
-    source.setTransform(Transform2D.MirrorX);
+    // camera-kit 0.9.0 DEPRECATED
+    //source = await createUserMediaSource();
+    //await session.setSource(source);
+
+    // camera-kit 0.10.0 UPDATED
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    const source = createMediaStreamSource(stream, {
+        transform: Transform2D.MirrorX,
+        cameraType: "back",
+    });
+    session.setSource(source);
+
     setRenderSize();
     //source.setRenderSize(360, 360);
 
