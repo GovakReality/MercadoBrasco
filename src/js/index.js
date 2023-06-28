@@ -23,32 +23,25 @@ window.addEventListener("load", async () => {
   // start snapchat lens
   try {
     const cameraKit = await bootstrapCameraKit({ apiToken: apiToken });
-    const session = await cameraKit.createSession();
 
-    session.events.addEventListener("error", (event) => console.error(event.detail));
+    const canvas = document.getElementById("canvas-output");
+    const session = await cameraKit.createSession(canvas);
 
-    document.getElementById('canvas-output').replaceWith(session.output.live);
-
-    const lens = await cameraKit.lensRepository.loadLens(lensId, groupId);
-    session.applyLens(lens);
-
-    // camera-kit 0.9.0 DEPRECATED
-    //source = await createUserMediaSource();
-    //await session.setSource(source);
-
-    // camera-kit 0.10.0 UPDATED
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    const source = createMediaStreamSource(stream, {
+    source = createMediaStreamSource(stream, {
         transform: Transform2D.MirrorX,
         cameraType: "back",
     });
+
+    //setRenderSize();
+
     session.setSource(source);
 
-    setRenderSize();
-    //source.setRenderSize(360, 360);
+    const lens = await cameraKit.lensRepository.loadLens(lensId, groupId);
+    await session.applyLens(lens);
 
-    session.play("live");
-        
+    await session.play();
+
   } catch (error) {
     console.error(error);
   }
@@ -80,7 +73,9 @@ function getWidth(value) {
 }
 
 function permissionHandle(status) {
-  console.log(getMobileOS());
+
+  OSHandle();
+
   if(status == "granted"){
 
     // hide loader gif
@@ -100,6 +95,16 @@ function permissionHandle(status) {
     // show loader gif
     document.getElementById('loader').style.display = 'block';
 
+  }
+}
+
+function OSHandle() {
+  if(getMobileOS() == "iOS"){
+    document.getElementById('warning-iphone').style.display = 'block';
+    document.getElementById('warning-android').style.display = 'none';
+  }  else { 
+    document.getElementById('warning-android').style.display = 'block';
+    document.getElementById('warning-iphone').style.display = 'none';
   }
 }
 

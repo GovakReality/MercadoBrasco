@@ -46,6 +46,7 @@ html, body {
 .warning img {
 	width: 400px;
 	max-width: 100%;
+	display: none;
 }
 
 .canvas-output { 
