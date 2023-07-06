@@ -158,7 +158,8 @@ function setRenderSize() {
   let h = document.documentElement.clientHeight;
   let w = document.documentElement.clientWidth;
   //let w = getWidth(h);
-  source.setRenderSize(w, h);
+  //source.setRenderSize(w, h);
+  source.setRenderSize(200, 200);
   //debug();
 }
 
